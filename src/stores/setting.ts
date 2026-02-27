@@ -62,12 +62,16 @@ export interface SettingState {
   taskbarLyricAnimationMode: "slide-blur" | "left-sm";
   /** 任务栏歌词单行模式 */
   taskbarLyricSingleLineMode: boolean;
+  /** 任务栏歌词逐字模式 */
+  taskbarLyricShowWordLyrics: boolean;
   /** 任务栏歌词跟随主题色 */
   taskbarLyricUseThemeColor: boolean;
   /** 任务栏歌词字重 */
   taskbarLyricFontWeight: number;
   /** 是否使用在线服务 */
   useOnlineService: boolean;
+  /** 分享链接格式 */
+  shareUrlFormat: "web" | "mobile";
   /** 启动时检查更新 */
   checkUpdateOnStart: boolean;
   /** 隐藏 VIP 标签 */
@@ -83,7 +87,7 @@ export interface SettingState {
   /** 歌词字重设置 */
   lyricFontWeight: number;
   /** 显示逐字歌词 */
-  showYrc: boolean;
+  showWordLyrics: boolean;
   /** 显示歌词翻译 */
   showTran: boolean;
   /** 显示歌词音译 */
@@ -106,6 +110,7 @@ export interface SettingState {
   hideBracketedContent: boolean;
   /** 替换歌词括号内容 */
   replaceLyricBrackets: boolean;
+  uncensorMaskedProfanity: boolean;
   /** 歌词括号替换预设 */
   bracketReplacementPreset: "dash" | "angleBrackets" | "cornerBrackets" | "custom";
   /** 自定义歌词括号替换内容 */
@@ -222,6 +227,8 @@ export interface SettingState {
   smtcOpen: boolean;
   /** 歌词模糊 */
   lyricsBlur: boolean;
+  /** 歌词混合模式 */
+  lyricsBlendMode: "screen" | "plus-lighter";
   /** 播放试听 */
   playSongDemo: boolean;
   /** 显示搜索历史 */
@@ -513,6 +520,7 @@ export const useSettingStore = defineStore("setting", {
     routeAnimation: "slide",
     playerExpandAnimation: "up",
     useOnlineService: true,
+    shareUrlFormat: "web",
     showCloseAppTip: true,
     closeAppMethod: "hide",
     showTaskbarProgress: false,
@@ -525,6 +533,7 @@ export const useSettingStore = defineStore("setting", {
     taskbarLyricShowWhenPaused: true,
     taskbarLyricAnimationMode: "slide-blur",
     taskbarLyricSingleLineMode: false,
+    taskbarLyricShowWordLyrics: true,
     taskbarLyricUseThemeColor: false,
     taskbarLyricFontWeight: 400,
     checkUpdateOnStart: true,
@@ -581,7 +590,7 @@ export const useSettingStore = defineStore("setting", {
     lyricPriority: "auto",
     localLyricQQMusicMatch: false,
     amllDbServer: defaultAMLLDbServer,
-    showYrc: true,
+    showWordLyrics: true,
     showTran: true,
     showRoma: true,
     swapTranRoma: false,
@@ -589,11 +598,13 @@ export const useSettingStore = defineStore("setting", {
     lyricTransition: "slide",
     lyricsPosition: "flex-start",
     lyricsBlur: false,
+    lyricsBlendMode: "screen",
     lyricsScrollOffset: 0.25,
     lyricHorizontalOffset: 10,
     lyricAlignRight: false,
     hideBracketedContent: false,
     replaceLyricBrackets: false,
+    uncensorMaskedProfanity: false,
     bracketReplacementPreset: "dash",
     customBracketReplacement: "-",
     enableExcludeLyrics: true,

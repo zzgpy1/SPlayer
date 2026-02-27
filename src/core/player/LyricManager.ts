@@ -7,6 +7,7 @@ import type { LyricPriority, SongLyric } from "@/types/lyric";
 import type { SongType } from "@/types/main";
 import { isElectron } from "@/utils/env";
 import { applyBracketReplacement } from "@/utils/lyric/lyricFormat";
+import { applyProfanityUncensor } from "@/utils/lyric/lyricProfanity";
 import {
   alignLyrics,
   isWordLevelFormat,
@@ -27,6 +28,10 @@ interface LyricFetchResult {
   };
 }
 
+/**
+ * 歌词管理器
+ * 负责歌词的获取、缓存、预加载等操作
+ */
 class LyricManager {
   /**
    * 在线歌词请求序列
@@ -806,10 +811,12 @@ class LyricManager {
   private setFinalLyric(lyricData: SongLyric, req: number) {
     const musicStore = useMusicStore();
     const statusStore = useStatusStore();
+    const settingStore = useSettingStore();
     // 若非本次
     if (this.activeLyricReq !== req) return;
     // 应用括号替换
     lyricData = applyBracketReplacement(lyricData);
+    lyricData = applyProfanityUncensor(lyricData, settingStore.uncensorMaskedProfanity);
     // 规范化时间
     this.normalizeLyricLines(lyricData.yrcData);
     this.normalizeLyricLines(lyricData.lrcData);
@@ -834,7 +841,7 @@ class LyricManager {
       statusStore.lyricLoading = false;
       // 单曲循环时，歌词数据未变，需通知桌面歌词取消加载状态
       if (isElectron) {
-        window.electron.ipcRenderer.send("update-desktop-lyric-data", {
+        window.electron.ipcRenderer.send("desktop-lyric:update-data", {
           lyricLoading: false,
         });
       }

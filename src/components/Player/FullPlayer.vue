@@ -116,7 +116,7 @@ const isShowComment = computed<boolean>(
 /** 没有歌词 */
 const noLrc = computed<boolean>(() => {
   const noNormalLrc = !musicStore.isHasLrc;
-  const noYrcAvailable = !musicStore.isHasYrc || !settingStore.showYrc;
+  const noYrcAvailable = !musicStore.isHasYrc || !settingStore.showWordLyrics;
   return noNormalLrc && noYrcAvailable;
 });
 
@@ -159,7 +159,7 @@ const playerDataCenter = computed<boolean>(
 
 // 当前实时歌词
 const instantLyrics = computed(() => {
-  const isYrc = musicStore.songLyric.yrcData?.length && settingStore.showYrc;
+  const isYrc = musicStore.songLyric.yrcData?.length && settingStore.showWordLyrics;
   const content = isYrc
     ? musicStore.songLyric.yrcData[statusStore.lyricIndex]
     : musicStore.songLyric.lrcData[statusStore.lyricIndex];
@@ -269,7 +269,6 @@ onBeforeUnmount(() => {
     align-items: center;
     width: 100%;
     height: calc(100vh - 160px);
-    z-index: 0;
     transition:
       opacity 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
       transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -294,6 +293,7 @@ onBeforeUnmount(() => {
       height: 100%;
       display: flex;
       flex-direction: column;
+      mix-blend-mode: v-bind('settingStore.lyricsBlendMode');
       transition:
         width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
         opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);

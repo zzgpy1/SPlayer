@@ -9,16 +9,16 @@ import { usePlayerController } from "./PlayerController";
 import {
   enableDiscordRpc,
   sendMediaMetadata,
-  sendMediaPlaybackRate,
   sendMediaPlayMode,
   sendMediaPlayState,
+  sendMediaPlaybackRate,
+  sendMediaVolume,
   sendMediaTimeline,
   updateDiscordConfig,
 } from "./PlayerIpc";
 
 /**
  * 媒体会话管理器，负责不同平台的媒体控制集成
- *
  * 在 Electron 平台上会使用原生插件，Web 平台上会使用 Navigator.mediaSession
  */
 class MediaSessionManager {
@@ -76,6 +76,11 @@ class MediaSessionManager {
       case "SetRate":
         if (event.rate != null) {
           player.setRate(event.rate);
+        }
+        break;
+      case "SetVolume":
+        if (event.volume != null) {
+          player.setVolume(event.volume);
         }
         break;
     }
@@ -295,8 +300,8 @@ class MediaSessionManager {
     if (this.shouldUseNativeMedia()) {
       if (immediate) {
         this.throttledSendTimeline.cancel();
-        // 取消节流就会立刻触发一次更新了，所以不再发送一个多余的事件
-        // sendMediaTimeline(position, duration);
+        // 绝对位置更新，避免 Seek 操作的进度更新被限流丢弃
+        sendMediaTimeline(position, duration, true);
       } else {
         this.throttledSendTimeline(position, duration);
       }
@@ -325,6 +330,12 @@ class MediaSessionManager {
 
     if (this.shouldUseNativeMedia()) {
       sendMediaPlaybackRate(rate);
+    }
+  }
+
+  public updateVolume(volume: number) {
+    if (this.shouldUseNativeMedia()) {
+      sendMediaVolume(volume);
     }
   }
 

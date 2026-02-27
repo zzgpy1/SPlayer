@@ -263,13 +263,13 @@ export const useLyricSettings = (): SettingConfig => {
             }),
           },
           {
-            key: "showYrc",
+            key: "showWordLyrics",
             label: "显示逐字歌词",
             type: "switch",
             description: "对性能要求较高，若发生卡顿请关闭",
             value: computed({
-              get: () => settingStore.showYrc,
-              set: (v) => (settingStore.showYrc = v),
+              get: () => settingStore.showWordLyrics,
+              set: (v) => (settingStore.showWordLyrics = v),
             }),
             children: [
               {
@@ -337,6 +337,20 @@ export const useLyricSettings = (): SettingConfig => {
             value: computed({
               get: () => settingStore.lyricsBlur,
               set: (v) => (settingStore.lyricsBlur = v),
+            }),
+          },
+          {
+            key: "lyricsBlendMode",
+            label: "歌词混合模式",
+            type: "select",
+            description: "全屏歌词区域的颜色混合模式",
+            options: [
+              { label: "Screen", value: "screen" },
+              { label: "Plus Lighter", value: "plus-lighter" },
+            ],
+            value: computed({
+              get: () => settingStore.lyricsBlendMode,
+              set: (v) => (settingStore.lyricsBlendMode = v),
             }),
           },
           {
@@ -634,14 +648,14 @@ export const useLyricSettings = (): SettingConfig => {
             action: openFontManager,
           },
           {
-            key: "desktopLyricShowYrc",
+            key: "desktopLyricShowWordLyrics",
             label: "显示逐字歌词",
             type: "switch",
             description: "是否显示桌面歌词逐字效果",
             value: computed({
-              get: () => desktopLyricConfig.showYrc,
+              get: () => desktopLyricConfig.showWordLyrics,
               set: (v) => {
-                desktopLyricConfig.showYrc = v;
+                desktopLyricConfig.showWordLyrics = v;
                 saveDesktopLyricConfig();
               },
             }),
@@ -918,6 +932,13 @@ export const useLyricSettings = (): SettingConfig => {
             type: "switch",
             description: "是否仅显示单行歌词（不显示下一句）",
             value: toRef(settingStore, "taskbarLyricSingleLineMode"),
+          },
+          {
+            key: "taskbarLyricShowWordLyrics",
+            label: "显示逐字歌词",
+            type: "switch",
+            description: "是否显示任务栏歌词逐字效果",
+            value: toRef(settingStore, "taskbarLyricShowWordLyrics"),
           },
           {
             key: "taskbarLyricFontWeight",
