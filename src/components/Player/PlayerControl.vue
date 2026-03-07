@@ -39,18 +39,24 @@
           >
             <SvgIcon name="Download" />
           </div>
-          <!-- 显示评论 -->
-          <div
-            v-if="
-              !musicStore.playSong.path &&
-              !statusStore.pureLyricMode &&
-              settingStore.fullscreenPlayerElements.comments
+          <n-badge
+            :value="formatCommentCount(statusStore.songCommentCount)"
+            :show="
+              statusStore.songCommentCount > 0 && settingStore.fullscreenPlayerElements.commentCount
             "
-            class="menu-icon"
-            @click.stop="statusStore.showPlayerComment = !statusStore.showPlayerComment"
           >
-            <SvgIcon :depth="statusStore.showPlayerComment ? 1 : 3" name="Message" />
-          </div>
+            <div
+              v-if="
+                !musicStore.playSong.path &&
+                !statusStore.pureLyricMode &&
+                settingStore.fullscreenPlayerElements.comments
+              "
+              class="menu-icon"
+              @click.stop="statusStore.showPlayerComment = !statusStore.showPlayerComment"
+            >
+              <SvgIcon :depth="statusStore.showPlayerComment ? 1 : 3" name="Message" />
+            </div>
+          </n-badge>
         </n-flex>
         <div class="center">
           <div class="btn">
@@ -151,6 +157,8 @@ import { useDataStore, useMusicStore, useStatusStore, useSettingStore } from "@/
 import { toLikeSong } from "@/utils/auth";
 import { useTimeFormat } from "@/composables/useTimeFormat";
 import { openDownloadSong, openPlaylistAdd } from "@/utils/modal";
+import { getComment } from "@/api/comment";
+import { formatCommentCount } from "@/utils/format";
 
 const dataStore = useDataStore();
 const musicStore = useMusicStore();
@@ -161,6 +169,46 @@ const songManager = useSongManager();
 const player = usePlayerController();
 
 const { timeDisplay, toggleTimeFormat } = useTimeFormat();
+
+// 获取评论数量
+const fetchCommentCount = async () => {
+  if (!settingStore.fullscreenPlayerElements.commentCount) return;
+  const id = musicStore.playSong.id;
+  if (!id || typeof id !== "number" || musicStore.playSong.path) return;
+  try {
+    const type = musicStore.playSong.type === "radio" ? 4 : 0;
+    const result = await getComment(id, type as 0 | 4, 1, 1);
+    if (result.data?.totalCount != null) {
+      statusStore.songCommentCount = result.data.totalCount;
+    }
+  } catch {
+    // 忽略错误
+  }
+};
+
+// 歌曲变化时获取评论数量
+watch(
+  () => musicStore.playSong.id,
+  () => {
+    statusStore.songCommentCount = 0;
+    fetchCommentCount();
+  },
+);
+
+watch(
+  () => settingStore.fullscreenPlayerElements.commentCount,
+  (val) => {
+    if (val && statusStore.songCommentCount === 0) {
+      fetchCommentCount();
+    }
+  },
+);
+
+onMounted(() => {
+  if (musicStore.playSong.id && !musicStore.playSong.path) {
+    fetchCommentCount();
+  }
+});
 
 const showAutomixFx = ref(false);
 let automixFxTimer: number | null = null;
@@ -272,6 +320,12 @@ onBeforeUnmount(() => {
       }
       &:active {
         transform: scale(1);
+      }
+    }
+    :deep(.n-badge-sup) {
+      background-color: rgba(var(--main-cover-color), 0.14);
+      .n-base-slot-machine {
+        color: rgb(var(--main-cover-color));
       }
     }
     :deep(.right-menu) {
