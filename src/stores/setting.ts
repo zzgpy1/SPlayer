@@ -154,6 +154,8 @@ export interface SettingState {
   playDevice: "default" | string;
   /** 音频引擎: element (原生) 或 ffmpeg */
   audioEngine: "element" | "ffmpeg";
+  /** Web Audio 延迟策略 */
+  audioLatencyHint: "interactive" | "playback";
   /** 自动播放 */
   autoPlay: boolean;
   /** 预载下一首 */
@@ -178,6 +180,8 @@ export interface SettingState {
   timeFormat: TimeFormat;
   /** 播放器类型 */
   playerType: "cover" | "record" | "fullscreen";
+  /** 评论显示模式 */
+  commentDisplayMode: "fullscreen" | "left" | "right";
   /** 背景类型 */
   playerBackgroundType: "none" | "animation" | "blur" | "color";
   /** 背景动画帧率 */
@@ -210,8 +214,6 @@ export interface SettingState {
   lyricsBlendMode: "screen" | "plus-lighter";
   /** 播放试听 */
   playSongDemo: boolean;
-  /** 显示搜索历史 */
-  showSearchHistory: boolean;
   /** 是否使用 AMLL 歌词 */
   useAMLyrics: boolean;
   /** 是否使用 AMLL 歌词弹簧效果 */
@@ -222,6 +224,8 @@ export interface SettingState {
   wordFadeWidth: number;
   /** 歌词时延调节步长（毫秒） */
   lyricOffsetStep: number;
+  /** 音频延迟手动补偿（毫秒） */
+  audioDelayCompensation: number;
   /** 启用在线 TTML 歌词 */
   enableOnlineTTMLLyric: boolean;
   /** 启用 QM 歌词 */
@@ -404,6 +408,10 @@ export interface SettingState {
   };
   /** 启用搜索关键词获取 */
   enableSearchKeyword: boolean;
+  /** 显示搜索历史 */
+  showSearchHistory: boolean;
+  /** 显示热搜榜 */
+  showHotSearch: boolean;
   /** 搜索框行为 */
   searchInputBehavior: "normal" | "clear" | "sync";
   /** 显示主页问好 */
@@ -494,7 +502,6 @@ export const useSettingStore = defineStore("setting", {
     englishLyricFont: "follow",
     koreanLyricFont: "follow",
     hideVipTag: false,
-    showSearchHistory: true,
     menuShowCover: true,
     menuExpandedKeys: [],
     routeAnimation: "slide",
@@ -511,6 +518,7 @@ export const useSettingStore = defineStore("setting", {
     songLevel: "exhigh",
     playDevice: "default",
     audioEngine: "element",
+    audioLatencyHint: "interactive",
     autoPlay: false,
     useNextPrefetch: true,
     songVolumeFade: true,
@@ -528,6 +536,7 @@ export const useSettingStore = defineStore("setting", {
     barLyricShow: true,
     timeFormat: "current-total",
     playerType: "cover",
+    commentDisplayMode: "fullscreen",
     playerBackgroundType: "blur",
     playerBackgroundFps: 30,
     playerBackgroundFlowSpeed: 4,
@@ -554,6 +563,7 @@ export const useSettingStore = defineStore("setting", {
     hidePassedLines: false,
     wordFadeWidth: 0.5,
     lyricOffsetStep: 500,
+    audioDelayCompensation: 0,
     enableOnlineTTMLLyric: false,
     enableQQMusicLyric: false,
     lyricPriority: "auto",
@@ -694,6 +704,8 @@ export const useSettingStore = defineStore("setting", {
       musicTagEditor: true,
     },
     enableSearchKeyword: true,
+    showSearchHistory: true,
+    showHotSearch: true,
     searchInputBehavior: "normal",
     showHomeGreeting: true,
     homePageSections: [
